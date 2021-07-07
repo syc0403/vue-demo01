@@ -1,28 +1,57 @@
 <template>
-  <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+  <div class="title">
+     <w-cates :cates="cates" @getCatId="getCatId"></w-cates>
+     <w-articles :articles="articles" @getArtId="getArtIds"></w-articles>
   </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
-
+import { get,getNoParam } from "@/utils/request.js";
+import wCates from "./components/w-cates.vue"
+import wArticles from "./components/w-articles.vue"
 export default {
   name: 'App',
+  data() {
+    return {
+      cates: [],
+      articles: [],
+    };
+  },
+   async created() {
+    //加载
+
+    let res1 = await getNoParam("api/articlecate/getmobilearticlecates");
+    this.cates = res1.data;
+
+    let res2 = await getNoParam("/api/articles/open");
+    this.articles = res2.data;
+  },
+  methods: {
+   async getCatId(catId) {
+     let that=this;
+      console.log(catId);
+      let params={cat_id:catId}
+      let res=await get('api/articles/open',params)
+      console.log(res);
+      that.articles=res.data;
+    },
+    async getArtIds(ArtId){
+      console.log(ArtId);
+      let params={id:ArtId};
+      let res=await get('api/article/one',params);
+      let artlink=res.data.link;
+      console.log(artlink);
+      // this.$router.push({url:"artlink"});
+      window.location.href = artlink;
+    }
+  },
   components: {
-    HelloWorld
+    wCates, 
+    wArticles,
   }
 }
 </script>
 
 <style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
+
 </style>
